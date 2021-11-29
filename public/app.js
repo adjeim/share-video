@@ -155,7 +155,6 @@ const participantDisconnected = (participant) => {
 
 const shareVideo = async () => {
   let stream;
-  console.log(uploadedVideo)
 
   if (uploadedVideo.captureStream) {
     stream = uploadedVideo.captureStream();
@@ -166,15 +165,9 @@ const shareVideo = async () => {
     stream = null;
   }
 
-  console.log(stream)
   const tracks = stream.getTracks();
-  console.log(tracks)
-  var myVideoTrack = new Twilio.Video.LocalVideoTrack(tracks[1]);
-  var myAudioTrack = new Twilio.Video.LocalAudioTrack(tracks[0]);
-  myVideoTrack.name = 'uploadedVideo';
-  myAudioTrack.name = 'uploadedAudio';
-
-  console.log(videoRoom.localParticipant)
+  var myVideoTrack = new Twilio.Video.LocalVideoTrack(tracks[1], {name: 'uploadedVideo'});
+  var myAudioTrack = new Twilio.Video.LocalAudioTrack(tracks[0], {name: 'uploadedAudio'});
 
   // Publish the video's tracks
   videoRoom.localParticipant.publishTrack(myVideoTrack);
@@ -185,8 +178,18 @@ const shareVideo = async () => {
 }
 
 const unshareVideo = async () => {
-  console.log("in unshare video")
-  console.log(videoRoom.localParticipant.tracks)
+  const localTrackPublications = videoRoom.localParticipant.tracks;
+
+  // Unpublish the video's tracks
+  let tracksToRemove = [];
+
+  localTrackPublications.forEach((publication) => {
+    if (publication.trackName === 'uploadedVideo' || publication.trackName === 'uploadedAudio') {
+      tracksToRemove.push(publication.track);
+    }
+  })
+
+  videoRoom.localParticipant.unpublishTracks(tracksToRemove);
   uploadedVideo.remove();
   videoInput.value = null;
   unshareVideoButton.disabled = true;

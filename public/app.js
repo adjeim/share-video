@@ -104,7 +104,11 @@ const leaveRoom = (event) => {
   }
 
   localVideoDiv.remove();
-  uploadedVideo.remove();
+
+  if (uploadedVideo) {
+    uploadedVideo.remove();
+  }
+
   videoInput.value = null;
 
   joinRoomButton.disabled = false;
@@ -166,8 +170,8 @@ const shareVideo = async () => {
   }
 
   const tracks = stream.getTracks();
-  var myVideoTrack = new Twilio.Video.LocalVideoTrack(tracks[1], {name: 'uploadedVideo'});
-  var myAudioTrack = new Twilio.Video.LocalAudioTrack(tracks[0], {name: 'uploadedAudio'});
+  const myVideoTrack = new Twilio.Video.LocalVideoTrack(tracks[1], {name: 'uploadedVideo'});
+  const myAudioTrack = new Twilio.Video.LocalAudioTrack(tracks[0], {name: 'uploadedAudio'});
 
   // Publish the video's tracks
   videoRoom.localParticipant.publishTrack(myVideoTrack);
